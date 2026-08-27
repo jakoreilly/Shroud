@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Shroud.Cli/Shroud.Cli.csproj" />
+    <Project Path="src/Shroud.Core/Shroud.Core.csproj" />
+    <Project Path="src/Shroud.App/Shroud.App.csproj" />
+    <Project Path="src/Shroud.Ui/Shroud.Ui.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Shroud.Cli.Tests/Shroud.Cli.Tests.csproj" />
+    <Project Path="tests/Shroud.Core.Tests/Shroud.Core.Tests.csproj" />
+    <Project Path="tests/Shroud.App.Tests/Shroud.App.Tests.csproj" />
+    <Project Path="tests/Shroud.Ui.Tests/Shroud.Ui.Tests.csproj" />
+  </Folder>
+</Solution>

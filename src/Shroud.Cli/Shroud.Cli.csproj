@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Shroud.Cli</RootNamespace>
+    <AssemblyName>shroud</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Shroud.Cli.Tests" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Shroud.Core/Shroud.Core.csproj" />
+    <ProjectReference Include="../Shroud.App/Shroud.App.csproj" />
+  </ItemGroup>
+</Project>

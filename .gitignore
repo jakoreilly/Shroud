@@ -1,0 +1,23 @@
+# Build output
+bin/
+obj/
+dist/
+dist-ui/
+publish/
+artifacts/
+TestResults/
+
+# IDE / editor state
+.vs/
+.idea/
+*.user
+*.suo
+*.userprefs
+
+# Never commit key material or containers. Shroud writes an identity to ~/.shroud by
+# default, but keygen --out puts it wherever you point it, and that is often the repo
+# you happen to be standing in. A secret key committed once is a secret key leaked.
+*.key
+*.pub
+*.shroud
+.shroud/

@@ -1,0 +1,150 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Shroud.Ui.ViewModels"
+             xmlns:app="using:Shroud.App"
+             x:Class="Shroud.Ui.Views.FilesView"
+             x:DataType="vm:FilesViewModel">
+
+  <Grid RowDefinitions="Auto,*">
+
+    <StackPanel Grid.Row="0" Spacing="4" Margin="0,0,0,16">
+      <TextBlock Classes="h2" Text="Files" />
+      <TextBlock Classes="explainer"
+                 Text="Drop a file or folder here. If it's a shroud container, you'll be offered to open it; anything else, you'll be offered to protect it." />
+    </StackPanel>
+
+    <Grid Grid.Row="1">
+
+      <Border Name="DropZone" Classes="droptarget" IsVisible="{Binding !HasInput}"
+              DragDrop.AllowDrop="True" DragDrop.Drop="OnDrop"
+              DragDrop.DragEnter="OnDragEnter" DragDrop.DragLeave="OnDragLeave">
+        <StackPanel Classes="empty" Spacing="10">
+          <TextBlock Text="Drop a file or folder -- or choose one" HorizontalAlignment="Center" />
+          <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+            <Button Classes="quiet" Content="Choose a file…" Click="OnChooseFileClick" />
+            <Button Classes="quiet" Content="Choose a folder…" Click="OnChooseFolderClick" />
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <ScrollViewer IsVisible="{Binding HasInput}">
+        <StackPanel Spacing="16" MaxWidth="560" HorizontalAlignment="Left">
+
+          <Border Classes="card">
+            <StackPanel Spacing="6">
+              <TextBlock Text="{Binding InputPath}" TextWrapping="Wrap" FontWeight="SemiBold" />
+              <Button Classes="quiet" Content="Choose a different file or folder" Click="OnChangeInputClick"
+                      HorizontalAlignment="Left" IsEnabled="{Binding !IsBusy}" />
+            </StackPanel>
+          </Border>
+
+          <!-- Encrypt panel -->
+          <StackPanel Spacing="10" IsVisible="{Binding IsEncryptMode}" IsEnabled="{Binding !IsBusy}">
+            <TextBlock Classes="h2" Text="Protect this" />
+
+            <ToggleSwitch Content="Use a passphrase instead of a recipient"
+                          IsChecked="{Binding UsePassphraseForEncrypt, Mode=TwoWay}" />
+
+            <StackPanel Spacing="8" IsVisible="{Binding !UsePassphraseForEncrypt}">
+              <TextBlock Text="Who is it for?" FontWeight="SemiBold" />
+              <ComboBox ItemsSource="{Binding Contacts}" SelectedItem="{Binding SelectedRecipient, Mode=TwoWay}"
+                        PlaceholderText="Pick a contact" HorizontalAlignment="Stretch">
+                <ComboBox.ItemTemplate>
+                  <DataTemplate x:DataType="app:Contact">
+                    <TextBlock Text="{Binding}" Classes="fingerprint" />
+                  </DataTemplate>
+                </ComboBox.ItemTemplate>
+              </ComboBox>
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBox Text="{Binding RecipientKeyFilePath}" Watermark="...or a public key file" IsReadOnly="True" Width="300" />
+                <Button Classes="quiet" Content="Browse…" Click="OnBrowseRecipientClick" />
+              </StackPanel>
+            </StackPanel>
+
+            <StackPanel Spacing="8" IsVisible="{Binding UsePassphraseForEncrypt}">
+              <TextBox Watermark="Passphrase" PasswordChar="•" Text="{Binding EncryptPassphrase, Mode=TwoWay}" />
+              <TextBox Watermark="Confirm passphrase" PasswordChar="•" Text="{Binding ConfirmEncryptPassphrase, Mode=TwoWay}" />
+            </StackPanel>
+
+            <CheckBox Content="Sign as me" IsChecked="{Binding SignAsMe, Mode=TwoWay}" IsEnabled="{Binding HasIdentity}" />
+            <TextBlock Classes="explainer" Text="Signing lets the recipient confirm the file came from you." />
+
+            <TextBox Watermark="Your identity passphrase, if it has one" PasswordChar="•"
+                     Text="{Binding IdentityPassphrase, Mode=TwoWay}" IsVisible="{Binding SignAsMe}" />
+
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="Save to:" VerticalAlignment="Center" />
+              <TextBox Text="{Binding OutputPath, Mode=TwoWay}" Width="280" />
+              <Button Classes="quiet" Content="Choose…" Click="OnChooseOutputClick" />
+            </StackPanel>
+
+            <Button Classes="primary" Content="Encrypt" Command="{Binding RunCommand}" />
+          </StackPanel>
+
+          <!-- Decrypt panel -->
+          <StackPanel Spacing="10" IsVisible="{Binding IsDecryptMode}" IsEnabled="{Binding !IsBusy}">
+            <TextBlock Classes="h2" Text="Open this" />
+
+            <TextBlock Classes="explainer" TextWrapping="Wrap" IsVisible="{Binding IsSignedContainer}"
+                       Text="This container is signed. Choose who you expect it from and shroud will refuse it if the signature is anyone else's." />
+
+            <StackPanel Spacing="8" IsVisible="{Binding IsSignedContainer}">
+              <TextBlock Text="Expected sender" FontWeight="SemiBold" />
+              <ComboBox ItemsSource="{Binding Contacts}" SelectedItem="{Binding SelectedExpectedSender, Mode=TwoWay}"
+                        PlaceholderText="Anyone (just tell me who)" HorizontalAlignment="Stretch">
+                <ComboBox.ItemTemplate>
+                  <DataTemplate x:DataType="app:Contact">
+                    <TextBlock Text="{Binding}" Classes="fingerprint" />
+                  </DataTemplate>
+                </ComboBox.ItemTemplate>
+              </ComboBox>
+            </StackPanel>
+
+            <ToggleSwitch Content="Use a passphrase instead of your identity key"
+                          IsChecked="{Binding UsePassphraseForDecrypt, Mode=TwoWay}" />
+
+            <TextBox Watermark="Passphrase" PasswordChar="•" Text="{Binding DecryptPassphrase, Mode=TwoWay}"
+                     IsVisible="{Binding UsePassphraseForDecrypt}" />
+
+            <TextBox Watermark="Your identity passphrase, if it has one" PasswordChar="•"
+                     Text="{Binding IdentityPassphrase, Mode=TwoWay}" IsVisible="{Binding !UsePassphraseForDecrypt}" />
+
+            <CheckBox Content="This holds a folder -- unpack it" IsChecked="{Binding ExtractArchive, Mode=TwoWay}"
+                      IsVisible="{Binding IsArchiveContainer}" />
+
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="Save to:" VerticalAlignment="Center" />
+              <TextBox Text="{Binding OutputPath, Mode=TwoWay}" Width="280" />
+              <Button Classes="quiet" Content="Choose…" Click="OnChooseOutputClick" />
+            </StackPanel>
+
+            <Button Classes="primary" Content="Decrypt" Command="{Binding RunCommand}" />
+          </StackPanel>
+
+          <!-- Result banner -->
+          <Border Classes="banner" IsVisible="{Binding HasResult}"
+                  Classes.good="{Binding ResultIsGood}" Classes.caution="{Binding ResultIsCaution}"
+                  Classes.bad="{Binding ResultIsBad}" Classes.neutral="{Binding ResultIsNeutral}">
+            <StackPanel Spacing="6">
+              <TextBlock Text="{Binding Result.Lead}" FontWeight="Bold" />
+              <TextBlock Text="{Binding Result.Body}" TextWrapping="Wrap" />
+              <Button Classes="quiet" Content="Replace the existing file" Command="{Binding ReplaceCommand}"
+                      IsVisible="{Binding AwaitingForceConfirmation}" />
+            </StackPanel>
+          </Border>
+
+        </StackPanel>
+      </ScrollViewer>
+
+      <Grid Classes="busy" IsVisible="{Binding IsBusy}">
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10" Width="280">
+          <TextBlock Text="{Binding BusyLabel}" HorizontalAlignment="Center" />
+          <ProgressBar Value="{Binding Progress}" Minimum="0" Maximum="1" />
+          <Button Classes="quiet" Content="Cancel" Command="{Binding CancelCommand}" HorizontalAlignment="Center" />
+        </StackPanel>
+      </Grid>
+
+    </Grid>
+  </Grid>
+
+</UserControl>

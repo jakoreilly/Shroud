@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Shroud.Ui</RootNamespace>
+    <AssemblyName>shroud-ui</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Shroud.Ui.Tests" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.3.7" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.7" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.7" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="11.3.7" Condition="'$(Configuration)'=='Debug'" />
+    <!-- Pinned: Avalonia.Desktop pulls Tmds.DBus.Protocol 0.21.2 transitively for its Linux
+         backend, which has a high-severity advisory (GHSA-xrw6-gwf8-vvr9). TreatWarningsAsErrors
+         (Directory.Build.props) turns that NU1903 restore warning into a build failure. A direct
+         reference to 0.21.3 wins over the transitive one. -->
+    <PackageReference Include="Tmds.DBus.Protocol" Version="0.21.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Shroud.App/Shroud.App.csproj" />
+    <ProjectReference Include="../Shroud.Core/Shroud.Core.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,68 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Shroud.Ui.ViewModels"
+             xmlns:app="using:Shroud.App"
+             xmlns:conv="using:Avalonia.Data.Converters"
+             x:Class="Shroud.Ui.Views.ContactsView"
+             x:DataType="vm:ContactsViewModel">
+
+  <Grid RowDefinitions="Auto,Auto,*">
+
+    <StackPanel Grid.Row="0" Spacing="4" Margin="0,0,0,16">
+      <TextBlock Classes="h2" Text="Contacts" />
+      <TextBlock Classes="explainer"
+                 Text="A contact is a public key you have checked. Checking it once here means shroud can tell you who signed a file, instead of showing you a fingerprint you have to compare by hand every time." />
+    </StackPanel>
+
+    <Border Grid.Row="1" Classes="card" Margin="0,0,0,16">
+      <StackPanel Spacing="8">
+        <TextBlock Text="Add a contact" FontWeight="SemiBold" />
+
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <TextBox Text="{Binding KeyFilePath}" Watermark="Their public key file" IsReadOnly="True" Width="300" />
+          <Button Classes="quiet" Content="Browse…" Click="OnBrowseClick" />
+        </StackPanel>
+
+        <TextBox Text="{Binding Name, Mode=TwoWay}" Watermark="Name them" />
+        <TextBlock Text="Use letters, digits, dot, dash and underscore." Classes="explainer" Margin="0"
+                   Foreground="{DynamicResource BannerBadBorder}"
+                   IsVisible="{Binding !NameIsValid}" />
+
+        <!-- Deliberately empty by default: never pre-filled from the key file. Confirming the
+             fingerprint out of band is the one trust decision this tool has. -->
+        <TextBox Text="{Binding FingerprintInput, Mode=TwoWay}" Watermark="Fingerprint they gave you" />
+        <TextBlock Text="Ask them for this over a channel the key file did not travel on." Classes="explainer" Margin="0" />
+
+        <Button Classes="primary" Content="Add contact" Command="{Binding AddCommand}" />
+
+        <Border Classes="banner bad" IsVisible="{Binding ErrorMessage, Converter={x:Static conv:StringConverters.IsNotNullOrEmpty}}">
+          <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" />
+        </Border>
+        <Border Classes="banner good" IsVisible="{Binding SuccessMessage, Converter={x:Static conv:StringConverters.IsNotNullOrEmpty}}">
+          <TextBlock Text="{Binding SuccessMessage}" TextWrapping="Wrap" />
+        </Border>
+      </StackPanel>
+    </Border>
+
+    <Grid Grid.Row="2">
+      <StackPanel Classes="empty" IsVisible="{Binding !HasContacts}">
+        <TextBlock Classes="h2" Text="No contacts yet" HorizontalAlignment="Center" />
+        <TextBlock Classes="explainer" HorizontalAlignment="Center" MaxWidth="360"
+                   Text="Add someone's .pub file, then type the fingerprint they read you over the phone. shroud will refuse to add it if the two don't match -- that refusal is the point." />
+      </StackPanel>
+
+      <ListBox ItemsSource="{Binding Contacts}" IsVisible="{Binding HasContacts}">
+        <ListBox.ItemTemplate>
+          <DataTemplate x:DataType="app:Contact">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Grid.Column="0" Text="{Binding}" Classes="fingerprint" VerticalAlignment="Center" />
+              <Button Grid.Column="1" Classes="quiet" Content="Remove" Click="OnRemoveClick" />
+            </Grid>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </Grid>
+
+  </Grid>
+
+</UserControl>

@@ -1,0 +1,100 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- Card: every panel and list row container. -->
+  <Style Selector="Border.card">
+    <Setter Property="Background" Value="{DynamicResource CardBackground}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource CardBorder}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="8" />
+    <Setter Property="Padding" Value="20" />
+  </Style>
+
+  <!-- Fingerprint: any fingerprint, anywhere. Monospace and selectable so it can be compared
+       character by character, which is the entire trust ceremony this tool has. -->
+  <Style Selector="TextBlock.fingerprint">
+    <Setter Property="FontFamily" Value="Cascadia Mono,Consolas,Courier New,monospace" />
+    <Setter Property="LetterSpacing" Value="1" />
+  </Style>
+  <Style Selector="SelectableTextBlock.fingerprint">
+    <Setter Property="FontFamily" Value="Cascadia Mono,Consolas,Courier New,monospace" />
+    <Setter Property="LetterSpacing" Value="1" />
+  </Style>
+
+  <!-- Section heading: panel titles. -->
+  <Style Selector="TextBlock.h2">
+    <Setter Property="FontSize" Value="18" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Margin" Value="0,0,0,8" />
+  </Style>
+
+  <!-- Explainer: the "what is this screen for" paragraph every screen has. -->
+  <Style Selector="TextBlock.explainer">
+    <Setter Property="Opacity" Value="0.75" />
+    <Setter Property="TextWrapping" Value="Wrap" />
+    <Setter Property="Margin" Value="0,0,0,12" />
+  </Style>
+
+  <!-- Empty state: first-run and no-results states. -->
+  <Style Selector="StackPanel.empty">
+    <Setter Property="Spacing" Value="8" />
+    <Setter Property="HorizontalAlignment" Value="Center" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+
+  <!-- Primary button: the one action a screen is for. -->
+  <Style Selector="Button.primary">
+    <Setter Property="Padding" Value="16,8" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+  </Style>
+
+  <!-- Quiet button: secondary actions (Copy, Remove, Cancel). -->
+  <Style Selector="Button.quiet">
+    <Setter Property="Padding" Value="10,6" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+  </Style>
+
+  <!-- Drop target: the Files screen. -->
+  <Style Selector="Border.droptarget">
+    <Setter Property="BorderThickness" Value="2" />
+    <Setter Property="BorderBrush" Value="{DynamicResource DropTargetBorder}" />
+    <Setter Property="CornerRadius" Value="8" />
+    <Setter Property="Padding" Value="24" />
+  </Style>
+  <Style Selector="Border.droptarget.dragover">
+    <Setter Property="BorderBrush" Value="{DynamicResource DropTargetBorderActive}" />
+  </Style>
+
+  <!-- Busy overlay: progress bar + label + Cancel, over whatever screen started an operation. -->
+  <Style Selector="Grid.busy">
+    <Setter Property="Background" Value="{DynamicResource BusyOverlayBackground}" />
+  </Style>
+
+  <!-- Banner: operation outcomes and signature standing. Colour is never the only signal:
+       every banner also carries a leading word, so the distinction survives greyscale. -->
+  <Style Selector="Border.banner">
+    <Setter Property="Padding" Value="14,12" />
+    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="BorderThickness" Value="1" />
+  </Style>
+  <Style Selector="Border.banner.good">
+    <Setter Property="Background" Value="{DynamicResource BannerGoodBg}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BannerGoodBorder}" />
+  </Style>
+  <Style Selector="Border.banner.caution">
+    <Setter Property="Background" Value="{DynamicResource BannerCautionBg}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BannerCautionBorder}" />
+  </Style>
+  <Style Selector="Border.banner.bad">
+    <Setter Property="Background" Value="{DynamicResource BannerBadBg}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BannerBadBorder}" />
+  </Style>
+  <Style Selector="Border.banner.neutral">
+    <Setter Property="Background" Value="{DynamicResource BannerNeutralBg}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BannerNeutralBorder}" />
+  </Style>
+
+</Styles>

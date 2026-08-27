@@ -1,0 +1,15 @@
+# Normalise to LF in the repository regardless of who commits. Without this the
+# stored line endings depend on each contributor's core.autocrlf setting, which
+# turns a whitespace-only checkout difference into a diff for everybody else.
+* text=auto eol=lf
+
+# Windows-only entry points; leave these CRLF in the working tree so cmd.exe and
+# older editors handle them predictably.
+*.cmd text eol=crlf
+
+# Never touched.
+*.png binary
+*.ico binary
+*.dll binary
+*.exe binary
+*.pdb binary

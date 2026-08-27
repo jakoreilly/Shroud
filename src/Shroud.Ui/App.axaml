@@ -1,0 +1,51 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Shroud.Ui.App"
+             RequestedThemeVariant="Default">
+
+  <Application.Styles>
+    <FluentTheme />
+    <StyleInclude Source="avares://shroud-ui/Styles/Components.axaml" />
+  </Application.Styles>
+
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.ThemeDictionaries>
+
+        <ResourceDictionary x:Key="Light">
+          <SolidColorBrush x:Key="CardBackground">#F3F3F5</SolidColorBrush>
+          <SolidColorBrush x:Key="CardBorder">#E1E1E6</SolidColorBrush>
+          <SolidColorBrush x:Key="DropTargetBorder">#C7C7CE</SolidColorBrush>
+          <SolidColorBrush x:Key="DropTargetBorderActive">#2F5FD6</SolidColorBrush>
+          <SolidColorBrush x:Key="BusyOverlayBackground">#CCFFFFFF</SolidColorBrush>
+          <SolidColorBrush x:Key="BannerGoodBg">#E3F6E8</SolidColorBrush>
+          <SolidColorBrush x:Key="BannerGoodBorder">#3EA55A</SolidColorBrush>
+          <SolidColorBrush x:Key="BannerCautionBg">#FFF6DD</SolidColorBrush>
+          <SolidColorBrush x:Key="BannerCautionBorder">#C99A1E</SolidColorBrush>
+          <SolidColorBrush x:Key="BannerBadBg">#FBE4E4</SolidColorBrush>
+          <SolidColorBrush x:Key="BannerBadBorder">#C94040</SolidColorBrush>
+          <SolidColorBrush x:Key="BannerNeutralBg">#EAEAEC</SolidColorBrush>
+          <SolidColorBrush x:Key="BannerNeutralBorder">#8C8C93</SolidColorBrush>
+        </ResourceDictionary>
+
+        <ResourceDictionary x:Key="Dark">
+          <SolidColorBrush x:Key="CardBackground">#24242A</SolidColorBrush>
+          <SolidColorBrush x:Key="CardBorder">#34343C</SolidColorBrush>
+          <SolidColorBrush x:Key="DropTargetBorder">#45454E</SolidColorBrush>
+          <SolidColorBrush x:Key="DropTargetBorderActive">#6EA0FF</SolidColorBrush>
+          <SolidColorBrush x:Key="BusyOverlayBackground">#CC000000</SolidColorBrush>
+          <SolidColorBrush x:Key="BannerGoodBg">#173321</SolidColorBrush>
+          <SolidColorBrush x:Key="BannerGoodBorder">#3EA55A</SolidColorBrush>
+          <SolidColorBrush x:Key="BannerCautionBg">#3A2F0E</SolidColorBrush>
+          <SolidColorBrush x:Key="BannerCautionBorder">#C99A1E</SolidColorBrush>
+          <SolidColorBrush x:Key="BannerBadBg">#3A1414</SolidColorBrush>
+          <SolidColorBrush x:Key="BannerBadBorder">#C94040</SolidColorBrush>
+          <SolidColorBrush x:Key="BannerNeutralBg">#28282C</SolidColorBrush>
+          <SolidColorBrush x:Key="BannerNeutralBorder">#8C8C93</SolidColorBrush>
+        </ResourceDictionary>
+
+      </ResourceDictionary.ThemeDictionaries>
+    </ResourceDictionary>
+  </Application.Resources>
+
+</Application>

@@ -1,0 +1,23 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Shroud.Ui.ViewModels"
+        xmlns:views="using:Shroud.Ui.Views"
+        x:Class="Shroud.Ui.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="shroud"
+        Width="960" Height="640"
+        MinWidth="720" MinHeight="480">
+
+  <TabControl TabStripPlacement="Left" Margin="12">
+    <TabItem Header="Identity">
+      <views:IdentityView DataContext="{Binding Identity}" Margin="16" />
+    </TabItem>
+    <TabItem Header="Contacts">
+      <views:ContactsView DataContext="{Binding Contacts}" Margin="16" />
+    </TabItem>
+    <TabItem Header="Files">
+      <views:FilesView DataContext="{Binding Files}" Margin="16" />
+    </TabItem>
+  </TabControl>
+
+</Window>
