@@ -393,6 +393,7 @@ re-protecting an existing key.
 | `Container is truncated: no chunk was marked as the end of the payload` | Incomplete file — a failed transfer looks like this. |
 | `Not a Shroud container (bad magic)` | Not a shroud file at all. |
 | `ARCHIVE: ... outside the destination directory` | The archive tried to write outside where you told it to. Exit 2. Treat the sender as hostile. |
+| `ARCHIVE: ... leaves the destination directory` | The destination already contained a link pointing elsewhere, and the archive tried to reach out through it. Exit 2. Treat the sender as hostile. |
 | `Fingerprint mismatch` | The key in the file is not the one you were told to expect. Do not add it. |
 
 On any failure the output file is not created and no partial plaintext is left behind: shroud writes

@@ -40,7 +40,20 @@ public static class ShroudHome
         if (Directory.Exists(directory))
             return;
 
-        Directory.CreateDirectory(directory);
+        // Create it already restricted where the platform allows: creating wide and narrowing
+        // afterwards leaves a window in which anyone can read what lands inside.
+        if (OperatingSystem.IsWindows())
+        {
+            Directory.CreateDirectory(directory);
+        }
+        else
+        {
+            Directory.CreateDirectory(
+                directory,
+                UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
+        }
+
+        // Still needed on Windows, and on Unix it re-applies the mode if umask masked it away.
         Restrict(directory);
     }
 
