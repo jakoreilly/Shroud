@@ -242,6 +242,13 @@ Read these before relying on it.
    it is the dependency. Only the KEM, X25519, ML-DSA and Argon2id go through it; the bulk
    AES-256-GCM uses the hardware-accelerated .NET implementation.
 
+8. **Archive extraction trusts the destination directory.** A tar from a counterparty is treated
+   as hostile: entry names are normalised, links are resolved as the tree is descended, and every
+   entry type except plain files and directories is refused. But checking a path and writing to it
+   are separate steps, so someone who can write into your destination *while extraction is
+   running* can still swap a directory for a link in between. Unpack into a directory only you can
+   write to.
+
 ## Alternatives worth preferring
 
 If any of these covers your case, use it instead — they have more review than this does.
