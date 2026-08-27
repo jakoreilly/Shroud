@@ -19,6 +19,12 @@ public sealed class ShroudPublicKey
 
     private readonly byte[] _blob;
 
+    // Decoding a lattice key is not free and one operation reads these more than once. Cached
+    // rather than rebuilt per access; a key instance is driven by one operation at a time, so
+    // plain fields are enough.
+    private MLKemPublicKeyParameters? _mlKem;
+    private MLDsaPublicKeyParameters? _mlDsa;
+
     internal ShroudPublicKey(byte[] blob)
     {
         if (blob.Length != ShroudFormat.PublicKeyBlobLength)
@@ -28,12 +34,12 @@ public sealed class ShroudPublicKey
     }
 
     internal MLKemPublicKeyParameters MlKem =>
-        MLKemPublicKeyParameters.FromEncoding(MLKemParameters.ml_kem_768, _blob[..X25519Offset]);
+        _mlKem ??= MLKemPublicKeyParameters.FromEncoding(MLKemParameters.ml_kem_768, _blob[..X25519Offset]);
 
     internal X25519PublicKeyParameters X25519 => new(_blob, X25519Offset);
 
     internal MLDsaPublicKeyParameters MlDsa =>
-        MLDsaPublicKeyParameters.FromEncoding(MLDsaParameters.ml_dsa_65, _blob[MlDsaOffset..]);
+        _mlDsa ??= MLDsaPublicKeyParameters.FromEncoding(MLDsaParameters.ml_dsa_65, _blob[MlDsaOffset..]);
 
     /// <summary>ML-KEM public key || X25519 public key || ML-DSA public key.</summary>
     public byte[] ToBlob() => (byte[])_blob.Clone();
@@ -69,6 +75,12 @@ public sealed class ShroudSecretKey
 
     private readonly byte[] _blob;
 
+    // Expanding a seed into a lattice key is expensive, and a single operation touches these
+    // several times over -- GetPublicKey, then decapsulation or signing. Cached rather than
+    // recomputed; a key instance is driven by one operation at a time, so plain fields are enough.
+    private MLKemPrivateKeyParameters? _mlKem;
+    private MLDsaPrivateKeyParameters? _mlDsa;
+
     internal ShroudSecretKey(byte[] blob)
     {
         if (blob.Length != ShroudFormat.SecretKeyBlobLength)
@@ -78,12 +90,12 @@ public sealed class ShroudSecretKey
     }
 
     internal MLKemPrivateKeyParameters MlKem =>
-        MLKemPrivateKeyParameters.FromSeed(MLKemParameters.ml_kem_768, _blob[..X25519Offset]);
+        _mlKem ??= MLKemPrivateKeyParameters.FromSeed(MLKemParameters.ml_kem_768, _blob[..X25519Offset]);
 
     internal X25519PrivateKeyParameters X25519 => new(_blob, X25519Offset);
 
     internal MLDsaPrivateKeyParameters MlDsa =>
-        MLDsaPrivateKeyParameters.FromSeed(MLDsaParameters.ml_dsa_65, _blob[MlDsaOffset..]);
+        _mlDsa ??= MLDsaPrivateKeyParameters.FromSeed(MLDsaParameters.ml_dsa_65, _blob[MlDsaOffset..]);
 
     public static ShroudSecretKey Generate()
     {

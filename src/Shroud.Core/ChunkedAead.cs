@@ -104,6 +104,10 @@ internal static class ChunkedAead
 
         var plaintext = new byte[Math.Max(chunkSize, ShroudFormat.SignatureTrailerLength)];
 
+        // Hoisted for the same reason `framed` is on the encrypt side: at the default chunk size a
+        // per-chunk array would be a Large Object Heap allocation for every chunk of the file.
+        var body = new byte[plaintext.Length + ShroudFormat.TagLength];
+
         Span<byte> aad = stackalloc byte[AadLength];
         ulong index = 0;
         long totalLength = 0;
@@ -121,7 +125,7 @@ internal static class ChunkedAead
             if (kind == ShroudFormat.ChunkSignatureTrailer && !expectTrailer)
                 throw new ShroudFormatException("Container carries a signature trailer but its header does not declare one.");
 
-            var body = ReadExactly(input, length + ShroudFormat.TagLength, index);
+            ReadExactly(input, body, length + ShroudFormat.TagLength, index);
 
             BuildAad(aad, headerHash, index, kind, length);
 
@@ -270,22 +274,26 @@ internal static class ChunkedAead
         return nonce;
     }
 
-    private static byte[] ReadExactly(Stream input, int count, ulong index)
+    private static void ReadExactly(Stream input, byte[] buffer, int count, ulong index)
     {
-        var buffer = new byte[count];
-        if (ReadUpTo(input, buffer) != count)
+        if (ReadUpTo(input, buffer, count) != count)
             throw new ShroudFormatException($"Container is truncated inside chunk {index}.");
-
-        return buffer;
     }
 
-    /// <summary>Fills the buffer, returning short only at end of stream.</summary>
-    private static int ReadUpTo(Stream stream, byte[] buffer)
+    private static int ReadUpTo(Stream stream, byte[] buffer) => ReadUpTo(stream, buffer, buffer.Length);
+
+    /// <summary>
+    /// Reads <paramref name="count"/> bytes into the front of the buffer, returning short only at
+    /// end of stream. Byte-array rather than Span on purpose: the input is wrapped in a progress
+    /// stream that overrides only Read(byte[], int, int), so a span read would fall back to
+    /// Stream's rent-and-copy path and give back what the reused buffer saves.
+    /// </summary>
+    private static int ReadUpTo(Stream stream, byte[] buffer, int count)
     {
         int total = 0;
-        while (total < buffer.Length)
+        while (total < count)
         {
-            int n = stream.Read(buffer, total, buffer.Length - total);
+            int n = stream.Read(buffer, total, count - total);
             if (n == 0)
                 break;
             total += n;
