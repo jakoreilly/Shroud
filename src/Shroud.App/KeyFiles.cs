@@ -14,12 +14,25 @@ public static class KeyFiles
         var armoured = passphrase is null ? key.ToArmoredString() : key.ToArmoredString(passphrase);
         var protection = passphrase is null ? "UNENCRYPTED" : "Argon2id + AES-256-GCM";
 
-        File.WriteAllText(
-            path,
+        var text =
             $"# Shroud secret key, fingerprint {fingerprint}, protection: {protection}.\n"
                 + "# Keep this file private. It is both your decryption key and your signing key.\n"
                 + armoured
-                + "\n");
+                + "\n";
+
+        // Create the file already restricted rather than writing it and narrowing afterwards:
+        // the gap between those two leaves the secret readable to everyone on the box.
+        var options = new FileStreamOptions { Mode = FileMode.Create, Access = FileAccess.Write };
+        if (!OperatingSystem.IsWindows())
+            options.UnixCreateMode = UnixFileMode.UserRead | UnixFileMode.UserWrite;
+
+        using (var stream = new FileStream(path, options))
+        using (var writer = new StreamWriter(stream))
+            writer.Write(text);
+
+        // Still needed: UnixCreateMode only applies when the file is created, so overwriting an
+        // existing key file would otherwise keep whatever mode it already had. Windows relies on
+        // this entirely.
         Restrict(path);
     }
 
@@ -59,7 +72,7 @@ public static class KeyFiles
 
             info.SetAccessControl(security);
         }
-        catch (Exception ex) when (ex is UnauthorizedAccessException or PlatformNotSupportedException)
+        catch (Exception ex) when (ex is UnauthorizedAccessException or PlatformNotSupportedException or IOException)
         {
             Console.Error.WriteLine($"shroud: warning: could not restrict permissions on {path}: {ex.Message}");
         }
