@@ -1,8 +1,22 @@
-# shroud — post-quantum file encryption
+<div align="center">
 
-Hybrid **ML-KEM-768 + X25519** key encapsulation over **AES-256-GCM**, with **ML-DSA-65** sender
-signatures and an Argon2id passphrase mode. .NET 10, one dependency (BouncyCastle), streams files
-of any size at disk speed.
+# Shroud
+
+**Post-quantum file encryption.**
+
+Encrypt a file to someone who has only your public key, or to a passphrase. The key
+transport and the signatures are post-quantum; the bulk cipher was already safe.
+.NET 10, one dependency, streams files of any size at disk speed.
+
+[![.NET](https://img.shields.io/badge/.NET-10-5eb3ff?style=flat-square)](https://dotnet.microsoft.com)
+[![dependencies](https://img.shields.io/badge/dependencies-1%20%C2%B7%20BouncyCastle-93a1b3?style=flat-square)](src/Shroud.Core/Shroud.Core.csproj)
+[![KEM](https://img.shields.io/badge/KEM-ML--KEM--768%20%2B%20X25519-52d18b?style=flat-square)](#what-is-actually-post-quantum-here)
+[![signatures](https://img.shields.io/badge/signatures-ML--DSA--65-52d18b?style=flat-square)](#signing-and-verifying)
+[![license](https://img.shields.io/badge/license-Apache--2.0-93a1b3?style=flat-square)](LICENSE)
+
+<img src="docs/images/pipeline.svg" alt="Shroud pipeline: a file is sealed with chunked AES-256-GCM under a per-file key; that key comes from an HKDF combiner fed by either ML-KEM-768 + X25519 (recipient mode) or Argon2id (passphrase mode); an optional ML-DSA-65 signature binds the header, both keys and the plaintext hash" width="100%">
+
+</div>
 
 > **This is a purpose-built format and it has not been audited.** The primitives are
 > BouncyCastle's; the container around them is mine. For anything high-stakes, use something
@@ -18,6 +32,18 @@ shroud decrypt --in report.pdf.shroud --out report.pdf --key bob.key --sender al
 
 `USAGE.md` is the operator's guide: recipes, key handling, scripting, and the mistakes worth
 avoiding. `FORMAT.md` is the wire format.
+
+---
+
+## What it is
+
+A single-file encryption tool and a small .NET library. It puts one file — or one directory,
+packed into a tar — into a `.shroud` container that only the intended recipient can open, and
+optionally signs it so the recipient can tell it came from you and was meant for them.
+
+Nothing leaves your machine. There is no service, no account, no network call at any point.
+The only dependency is BouncyCastle, and only the post-quantum primitives go through it; the
+bulk `AES-256-GCM` uses the hardware-accelerated .NET implementation.
 
 ## What is actually post-quantum here
 
@@ -46,7 +72,8 @@ computer cannot retroactively forge one you already checked — but it can forge
 day it exists, for as long as the key is in use. Post-quantum signing is about the lifetime of
 the **key**, not of the file.
 
-### Why hybrid, not ML-KEM alone
+<details>
+<summary><b>Why hybrid, not ML-KEM alone</b></summary>
 
 ML-KEM was standardised in FIPS 203 in August 2024 and has far less deployment scar tissue than
 X25519. Combining both means an attacker must break *both* to recover the file key, so adopting
@@ -57,13 +84,30 @@ The signature is **not** hybrid. A hybrid signature would have to be verified as
 anything, and it doubles the trailer for a threat model where a break is noticed rather than
 silently exploited. ML-DSA-65 alone is the trade this format makes; if that is the wrong trade
 for you, sign the container separately with something you trust.
+</details>
 
-### Why passphrase mode needs no PQ primitive
+<details>
+<summary><b>Why passphrase mode needs no PQ primitive</b></summary>
 
 It has no public-key step to attack. Argon2id plus AES-256 is quantum-safe as it stands. If your
 use case is "encrypt these files at rest with a passphrase", that mode is the whole answer and
 the ML-KEM machinery is not doing anything for you. Signing still works in that mode, and is the
 only part of it that involves a key pair.
+</details>
+
+---
+
+## Install
+
+**Requires:** the .NET 10 SDK. No installer, no service, no network access at any point.
+
+```
+dotnet publish src/Shroud.Cli -c Release -o dist       # the shroud CLI
+dotnet publish src/Shroud.Ui  -c Release -o dist-ui    # the desktop UI (optional)
+```
+
+That produces `dist/shroud` (`dist/shroud.exe` on Windows) alongside its DLLs — put the
+directory on your `PATH`, or invoke it by path.
 
 ## Two modes
 
@@ -91,6 +135,61 @@ shroud verify --in q3.shroud --key bob.key --sender alice.pub
 
 Directories work too: pass one to `--in` and shroud packs it into a tar, records that fact in the
 authenticated header, and unpacks it on the way out.
+
+### Worked examples
+
+<details>
+<summary><b>Send a file to someone</b></summary>
+
+```
+alice  $ shroud keygen                     # once; writes ~/.shroud/identity.{key,pub}
+bob    $ shroud keygen
+       … alice and bob exchange .pub files by any channel …
+       … each confirms the other's fingerprint by a call, then records it …
+
+alice  $ shroud contacts add --in bob.pub --name bob --fingerprint d83c9fbfed01dd22
+alice  $ shroud encrypt --in q3.xlsx --out q3.shroud --recipient bob
+         signed by identity 4f1c… · wrote q3.shroud (2.1 MiB)
+
+bob    $ shroud decrypt --in q3.shroud --out q3.xlsx --sender alice
+         signature: alice (confirmed contact) ✓
+```
+</details>
+
+<details>
+<summary><b>Encrypt your own files at rest</b></summary>
+
+```
+$ shroud encrypt --in tax-2024/ --out tax-2024.shroud --passphrase
+  passphrase: ········
+  packed 38 files into a tar · wrote tax-2024.shroud
+
+$ shroud decrypt --in tax-2024.shroud --out ./restored --passphrase
+  passphrase: ········
+  unpacked 38 files into ./restored
+```
+No key pair involved — Argon2id plus AES-256 is the whole thing.
+</details>
+
+<details>
+<summary><b>Check a container without decrypting it</b></summary>
+
+```
+$ shroud info --in q3.shroud
+  mode        recipient
+  suite       ML-KEM-768 + X25519 + ML-DSA-65 / HKDF-SHA256 / AES-256-GCM
+  signed      yes (identity is inside the encrypted region)
+  archive     no
+  chunk size  1 MiB
+
+$ shroud verify --in q3.shroud --key bob.key --sender alice.pub
+  intact ✓  ·  signed by alice.pub ✓
+$ echo $?
+  0            # 2 = malformed container, 3 = verification failed
+```
+</details>
+
+---
 
 ## Signing and verifying
 
@@ -153,6 +252,10 @@ shroud encrypt --in q3.xlsx --out q3.shroud --recipient bob
 happens once, deliberately, instead of being retyped or skipped on every file. Afterwards shroud
 names a known signer for you on decrypt, and reports an unknown one as unknown.
 
+<div align="center">
+<img src="docs/images/trust.svg" alt="Shroud trust model: one identity both receives and signs; you share a .pub file over any channel, confirm its fingerprint out of band, and record it with contacts add; on decrypt the result is exactly one of four standings — unsigned, signed by an unknown key, signed by a confirmed contact, or signed by the sender you named in advance" width="100%">
+</div>
+
 ## Desktop UI
 
 There is an Avalonia desktop front end alongside the CLI — `run-ui.cmd`, or
@@ -202,6 +305,29 @@ expect.
 `ShroudFile` is the entire public surface: `Encrypt`, `Decrypt`, `EncryptWithPassphrase`,
 `DecryptWithPassphrase`, `ReadHeader`.
 
+---
+
+## How it works
+
+The container is a cleartext header followed by a run of AES-256-GCM chunks, and every design
+choice in it is defensive. `FORMAT.md` is the full spec; the load-bearing decisions:
+
+- **`headerHash` keys every chunk.** The 9-byte prologue and the mode block are hashed, and that
+  hash is both the HKDF salt and part of every chunk's associated data. Editing any header
+  field — chunk size, suite, flags, the KEM ciphertext — changes the key and every tag fails.
+- **The nonce is a bare counter from zero, and that is safe** only because `fileKey` is never
+  reused: recipient mode draws a fresh ML-KEM encapsulation and ephemeral X25519 key per file,
+  passphrase mode a fresh salt. A `(key, nonce)` pair cannot recur.
+- **Chunks are self-describing and ordered.** `kind ‖ length ‖ ciphertext ‖ tag`, with `kind`
+  and `index` in the AAD, so truncation (no chunk still claims to be final), reordering,
+  duplication, and splicing from another container all fail loudly.
+- **The signature binds the recipient.** It covers the header hash, the sender's own key, the
+  recipient's key, and `SHA-256(plaintext) ‖ length` — so it cannot be lifted onto another file
+  or forwarded to a third party as though it were sent to them.
+- **Everything from an untrusted file is range-checked before allocation.** The flags byte is
+  rejected outright if any unknown bit is set; Argon2 costs are validated against fixed ranges
+  before a single byte is allocated.
+
 ## Integrity guarantees
 
 The container is authenticated as a whole, not just chunk by chunk. Truncating it, reordering its
@@ -241,7 +367,6 @@ Read these before relying on it.
    or OpenSSL 3.5+ on Linux. BouncyCastle's managed implementation works everywhere, which is why
    it is the dependency. Only the KEM, X25519, ML-DSA and Argon2id go through it; the bulk
    AES-256-GCM uses the hardware-accelerated .NET implementation.
-
 8. **Archive extraction trusts the destination directory.** A tar from a counterparty is treated
    as hostile: entry names are normalised, links are resolved as the tree is descended, and every
    entry type except plain files and directories is refused. But checking a path and writing to it
@@ -289,19 +414,18 @@ The Argon2id costs dominate everywhere they appear, by design:
 
 Container overhead on that 256 MiB file is 6526 bytes, or 13024 signed.
 
-## Build
+---
+
+## Development
 
 ```
 dotnet build
-dotnet test
-dotnet publish src/Shroud.Cli -c Release -o dist    # the shroud CLI
+dotnet test                                        # 226 tests, no network, no platform crypto provider
+dotnet publish src/Shroud.Cli -c Release -o dist   # the shroud CLI
 dotnet publish src/Shroud.Ui  -c Release -o dist-ui # the desktop UI
 ```
 
-Requires the .NET 10 SDK. 226 tests (101 format, 34 workspace, 85 CLI, 6 UI), no network
-access, no platform-specific crypto provider.
-
-## Layout
+Requires the .NET 10 SDK. The 226 tests split 101 format, 34 workspace, 85 CLI, 6 UI.
 
 Four projects: the format library, a workspace layer both front ends share, and the two
 front ends themselves.
@@ -344,3 +468,12 @@ tests/Shroud.Cli.Tests/     command behaviour: exit codes, option validation, st
                             contacts, directories, archive-extraction safety
 tests/Shroud.Ui.Tests/      view-model behaviour for the Files screen
 ```
+
+`USAGE.md` is the operator's guide · `FORMAT.md` is the wire format · `SECURITY.md` is the threat
+model and disclosure path.
+
+---
+
+<div align="center">
+<sub>A shroud is standing rigging — the fixed lines that hold the mast up from either side. It is not glamorous and it is not meant to move; it is meant to hold.</sub>
+</div>
