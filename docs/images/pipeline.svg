@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" width="900" height="500" font-family="ui-sans-serif, -apple-system, Segoe UI, Roboto, sans-serif">
+  <defs>
+    <marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#5eb3ff"/>
+    </marker>
+    <marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#52d18b"/>
+    </marker>
+    <marker id="w" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#f0b429"/>
+    </marker>
+  </defs>
+
+  <rect width="900" height="500" rx="14" fill="#0e1116"/>
+
+  <!-- ============ input ============ -->
+  <rect x="24" y="92" width="150" height="86" rx="12" fill="#161b23" stroke="#2a323f"/>
+  <text x="38" y="118" fill="#e6edf3" font-size="13.5" font-weight="650">your file</text>
+  <text x="38" y="139" fill="#93a1b3" font-size="11">any size, streamed at</text>
+  <text x="38" y="154" fill="#93a1b3" font-size="11">disk speed</text>
+  <text x="38" y="170" fill="#5b6878" font-size="10">a folder is tar'd first</text>
+
+  <rect x="24" y="250" width="150" height="92" rx="12" fill="#161b23" stroke="#2a323f"/>
+  <text x="38" y="275" fill="#5eb3ff" font-size="12" font-weight="650">recipient.pub</text>
+  <text x="38" y="290" fill="#93a1b3" font-size="10.5">→ recipient mode</text>
+  <text x="38" y="314" fill="#52d18b" font-size="12" font-weight="650">a passphrase</text>
+  <text x="38" y="329" fill="#93a1b3" font-size="10.5">→ passphrase mode</text>
+
+  <!-- ============ key derivation ============ -->
+  <rect x="200" y="64" width="286" height="300" rx="14" fill="#12171f" stroke="#2a323f"/>
+  <text x="216" y="86" fill="#93a1b3" font-size="11.5" font-weight="600" letter-spacing=".08em">KEY DERIVATION</text>
+
+  <rect x="214" y="98" width="258" height="86" rx="10" fill="#161b23" stroke="#5eb3ff" stroke-opacity=".45"/>
+  <text x="228" y="120" fill="#e6edf3" font-size="13" font-weight="650">recipient mode</text>
+  <text x="228" y="140" font-size="11"><tspan fill="#5eb3ff">ML-KEM-768</tspan><tspan fill="#93a1b3"> Encaps  +  X25519 ECDH</tspan></text>
+  <text x="228" y="156" fill="#93a1b3" font-size="10.5">two shared secrets, one extraction</text>
+  <text x="228" y="174" fill="#5b6878" font-size="10.5">an attacker must break BOTH</text>
+
+  <rect x="214" y="196" width="258" height="64" rx="10" fill="#161b23" stroke="#52d18b" stroke-opacity=".45"/>
+  <text x="228" y="218" fill="#e6edf3" font-size="13" font-weight="650">passphrase mode</text>
+  <text x="228" y="238" font-size="11"><tspan fill="#52d18b">Argon2id</tspan><tspan fill="#93a1b3">  t=3 · m=64 MiB · p=4</tspan></text>
+  <text x="228" y="252" fill="#5b6878" font-size="10.5">no public-key step to attack</text>
+
+  <rect x="214" y="272" width="258" height="62" rx="10" fill="#1d232d" stroke="#2a323f"/>
+  <text x="228" y="293" fill="#e6edf3" font-size="12.5" font-weight="650">HKDF-SHA256 combiner</text>
+  <text x="228" y="309" fill="#93a1b3" font-size="10">salt = SHA-256(header) · info binds recipient</text>
+  <text x="228" y="324" fill="#52d18b" font-size="10">→ fileKey · 32 bytes · unique per file</text>
+
+  <!-- ============ seal ============ -->
+  <rect x="512" y="150" width="170" height="150" rx="12" fill="#161b23" stroke="#52d18b" stroke-opacity=".45"/>
+  <text x="526" y="174" fill="#e6edf3" font-size="13.5" font-weight="650">chunked</text>
+  <text x="526" y="191" fill="#e6edf3" font-size="13.5" font-weight="650">AES-256-GCM</text>
+  <line x1="526" y1="201" x2="668" y2="201" stroke="#2a323f"/>
+  <text x="526" y="220" fill="#93a1b3" font-size="10.5">sealed in order, 1 MiB each</text>
+  <text x="526" y="236" fill="#93a1b3" font-size="10.5">nonce = counter from 0</text>
+  <text x="526" y="252" fill="#93a1b3" font-size="10.5">AAD binds header, index,</text>
+  <text x="526" y="266" fill="#93a1b3" font-size="10.5">kind and length</text>
+  <text x="526" y="287" fill="#5b6878" font-size="10">Grover only halves it — safe</text>
+
+  <!-- ============ output ============ -->
+  <rect x="712" y="110" width="164" height="228" rx="12" fill="#161b23" stroke="#2a323f"/>
+  <text x="726" y="134" fill="#e6edf3" font-size="13" font-weight="650">.shroud container</text>
+  <line x1="726" y1="144" x2="862" y2="144" stroke="#2a323f"/>
+  <rect x="726" y="156" width="136" height="34" rx="6" fill="#1d232d" stroke="#2a323f"/>
+  <text x="794" y="177" fill="#93a1b3" font-size="10.5" text-anchor="middle">header (cleartext)</text>
+  <rect x="726" y="196" width="136" height="52" rx="6" fill="#1d232d" stroke="#2a323f"/>
+  <text x="794" y="216" fill="#93a1b3" font-size="10.5" text-anchor="middle">chunk 0 … chunk N</text>
+  <text x="794" y="233" fill="#5b6878" font-size="9.5" text-anchor="middle">payload, AEAD</text>
+  <rect x="726" y="254" width="136" height="34" rx="6" fill="#1d232d" stroke="#f0b429" stroke-opacity=".5"/>
+  <text x="794" y="270" fill="#f0b429" font-size="10.5" text-anchor="middle">signature trailer</text>
+  <text x="794" y="283" fill="#5b6878" font-size="9.5" text-anchor="middle">only if signed</text>
+  <text x="726" y="312" fill="#93a1b3" font-size="10">authenticated as a whole —</text>
+  <text x="726" y="326" fill="#93a1b3" font-size="10">truncate, reorder, splice → fail</text>
+
+  <!-- ============ signature ============ -->
+  <rect x="214" y="392" width="468" height="66" rx="10" fill="#161b23" stroke="#5eb3ff" stroke-opacity=".4"/>
+  <text x="230" y="414" font-size="13" font-weight="650"><tspan fill="#e6edf3">ML-DSA-65 signature</tspan><tspan fill="#5b6878" font-size="11" font-weight="400">   optional, both modes</tspan></text>
+  <text x="230" y="433" fill="#93a1b3" font-size="10.5">covers  header · sender key · recipient key · SHA-256(plaintext) · length</text>
+  <text x="230" y="448" fill="#5b6878" font-size="10">recipient binding defeats surreptitious forwarding — the Davis attack</text>
+
+  <!-- ============ arrows ============ -->
+  <path d="M174 133 L508 196" stroke="#5eb3ff" stroke-width="2" marker-end="url(#b)"/>
+  <text x="300" y="150" fill="#93a1b3" font-size="10">plaintext</text>
+  <path d="M174 296 L198 258" stroke="#5eb3ff" stroke-width="2" marker-end="url(#b)"/>
+  <path d="M472 303 L508 252" stroke="#52d18b" stroke-width="2" marker-end="url(#g)"/>
+  <text x="474" y="284" fill="#52d18b" font-size="10">fileKey</text>
+  <path d="M682 200 L708 200" stroke="#52d18b" stroke-width="2" marker-end="url(#g)"/>
+  <path d="M614 392 L744 292" stroke="#f0b429" stroke-width="2" marker-end="url(#w)"/>
+
+  <!-- ============ legend ============ -->
+  <circle cx="218" cy="482" r="4" fill="#5eb3ff"/><text x="230" y="486" fill="#93a1b3" font-size="11">post-quantum primitive</text>
+  <circle cx="410" cy="482" r="4" fill="#52d18b"/><text x="422" y="486" fill="#93a1b3" font-size="11">already quantum-safe</text>
+  <circle cx="602" cy="482" r="4" fill="#5b6878"/><text x="614" y="486" fill="#93a1b3" font-size="11">classical, kept as a hedge</text>
+</svg>

@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 360" width="900" height="360" font-family="ui-sans-serif, -apple-system, Segoe UI, Roboto, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#5eb3ff"/>
+    </marker>
+  </defs>
+
+  <rect width="900" height="360" rx="14" fill="#0e1116"/>
+
+  <!-- ============ your identity ============ -->
+  <rect x="24" y="78" width="204" height="176" rx="12" fill="#161b23" stroke="#2a323f"/>
+  <text x="40" y="104" fill="#e6edf3" font-size="13.5" font-weight="650">your identity</text>
+  <text x="40" y="123" fill="#93a1b3" font-size="10.5">one key — it receives files</text>
+  <text x="40" y="137" fill="#93a1b3" font-size="10.5">and it signs them</text>
+  <line x1="40" y1="149" x2="212" y2="149" stroke="#2a323f"/>
+  <text x="40" y="168" fill="#5eb3ff" font-size="10.5">ML-KEM-768 · X25519 · ML-DSA-65</text>
+  <text x="40" y="186" fill="#93a1b3" font-size="10">public blob 3168 B</text>
+  <text x="40" y="200" fill="#93a1b3" font-size="10">secret seeds 128 B</text>
+  <text x="40" y="222" fill="#e6edf3" font-size="10.5">fingerprint =</text>
+  <text x="40" y="236" fill="#93a1b3" font-size="10">SHA-256(public blob), first 8 bytes</text>
+
+  <!-- ============ their pub ============ -->
+  <rect x="300" y="60" width="184" height="60" rx="10" fill="#161b23" stroke="#2a323f"/>
+  <text x="316" y="83" fill="#e6edf3" font-size="12.5" font-weight="650">their .pub file</text>
+  <text x="316" y="101" fill="#5b6878" font-size="10" font-family="ui-monospace, monospace">shroud-recipient:v2:…</text>
+
+  <!-- ============ confirm ============ -->
+  <rect x="300" y="176" width="184" height="92" rx="10" fill="#161b23" stroke="#52d18b" stroke-opacity=".45"/>
+  <text x="316" y="199" fill="#e6edf3" font-size="12.5" font-weight="650">contacts add</text>
+  <text x="316" y="217" fill="#93a1b3" font-size="10">--fingerprint d83c9fbfed01dd22</text>
+  <text x="316" y="235" fill="#93a1b3" font-size="10">refuses unless the value you</text>
+  <text x="316" y="248" fill="#93a1b3" font-size="10">type matches the key in the file</text>
+  <text x="316" y="263" fill="#5b6878" font-size="10">→ ~/.shroud/contacts</text>
+
+  <!-- ============ standings ============ -->
+  <rect x="540" y="52" width="336" height="252" rx="12" fill="#12171f" stroke="#2a323f"/>
+  <text x="556" y="76" fill="#93a1b3" font-size="11.5" font-weight="600" letter-spacing=".06em">ON DECRYPT — EXACTLY ONE STANDING</text>
+
+  <rect x="556" y="90" width="304" height="44" rx="8" fill="#1d232d" stroke="#2a323f"/>
+  <rect x="556" y="90" width="4" height="44" fill="#5b6878"/>
+  <text x="572" y="110" fill="#e6edf3" font-size="11.5" font-weight="600">unsigned</text>
+  <text x="572" y="125" fill="#93a1b3" font-size="9.5">no signature in the container</text>
+
+  <rect x="556" y="142" width="304" height="44" rx="8" fill="#1d232d" stroke="#2a323f"/>
+  <rect x="556" y="142" width="4" height="44" fill="#f0b429"/>
+  <text x="572" y="162" fill="#e6edf3" font-size="11.5" font-weight="600">signed · key unknown</text>
+  <text x="572" y="177" fill="#93a1b3" font-size="9.5">valid, but not a contact and not pinned</text>
+
+  <rect x="556" y="194" width="304" height="44" rx="8" fill="#1d232d" stroke="#2a323f"/>
+  <rect x="556" y="194" width="4" height="44" fill="#52d18b"/>
+  <text x="572" y="214" fill="#e6edf3" font-size="11.5" font-weight="600">signed · confirmed contact</text>
+  <text x="572" y="229" fill="#93a1b3" font-size="9.5">matches a fingerprint you checked</text>
+
+  <rect x="556" y="246" width="304" height="44" rx="8" fill="#1d232d" stroke="#52d18b" stroke-opacity=".5"/>
+  <rect x="556" y="246" width="4" height="44" fill="#52d18b"/>
+  <text x="572" y="266" fill="#e6edf3" font-size="11.5" font-weight="700">signed · expected sender</text>
+  <text x="572" y="281" fill="#93a1b3" font-size="9.5">--sender / VerificationPolicy.From pinned it</text>
+
+  <!-- ============ arrows ============ -->
+  <path d="M228 150 L296 92" stroke="#5eb3ff" stroke-width="2" marker-end="url(#a)"/>
+  <text x="236" y="112" fill="#93a1b3" font-size="10">share the .pub</text>
+  <text x="236" y="125" fill="#5b6878" font-size="9.5">any channel</text>
+  <path d="M392 120 L392 172" stroke="#5eb3ff" stroke-width="2" marker-end="url(#a)"/>
+  <text x="400" y="150" fill="#93a1b3" font-size="10">confirm out-of-band</text>
+  <path d="M484 222 L536 200" stroke="#5eb3ff" stroke-width="2" marker-end="url(#a)"/>
+
+  <!-- ============ footer ============ -->
+  <text x="24" y="330" fill="#93a1b3" font-size="10.5">The fingerprint comparison is the whole trust model — no PKI, no key servers, no revocation, no expiry.</text>
+</svg>
